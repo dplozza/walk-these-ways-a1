@@ -86,7 +86,7 @@ def load_policy(logdir):
 
 
 if __name__ == '__main__':
-    label = "gait-conditioned-agility/pretain-a1/train"
+    label = "gait-conditioned-agility/pretrain-a1/train"
 
     probe_policy_label = None
 
