@@ -63,6 +63,7 @@ class DeploymentRunner:
 
 
     def calibrate(self, wait=True, low=False):
+        print("CALIBRATING ROBOT POSE")
         # first, if the robot is not in nominal pose, move slowly to the nominal pose
         for agent_name in self.agents.keys():
             if hasattr(self.agents[agent_name], "get_obs"):
@@ -136,12 +137,16 @@ class DeploymentRunner:
 
         control_obs = self.calibrate(wait=True)
 
+        print("MAIN CONTROL LOOP STARTED")
+
         # now, run control loop
 
         try:
             for i in range(max_steps):
                 print(i)
-                print(control_obs.size())
+                print(control_obs)
+                #print(control_obs.size())
+                print("test2")
                 policy_info = {}
                 action = self.policy(control_obs, policy_info)
 
@@ -214,6 +219,8 @@ class DeploymentRunner:
                         time.sleep(0.01)
                         # self.button_states = self.command_profile.get_buttons()
                     self.command_profile.state_estimator.right_lower_right_switch_pressed = False
+
+            print("MAIN CONTROL LOOP FINISHED")
 
             # finally, return to the nominal pose
             control_obs = self.calibrate(wait=False)
