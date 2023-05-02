@@ -150,9 +150,9 @@ python -m ml_dash.server .
 Finally, use a web browser to go to the app IP (defaults to `localhost:3001`) 
 and create a new profile with the credentials:
 
-Username: `runs`
-API: [server IP] (defaults to `localhost:8081`)
-Access Token: [blank]
+Username: `runs` \
+API: [server IP] (default is `http://localhost:8081`) \
+Access Token: [blank] \
 
 Now, clicking on the profile should yield a dashboard interface visualizing the training runs.
 
