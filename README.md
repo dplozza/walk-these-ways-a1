@@ -150,9 +150,9 @@ python -m ml_dash.server .
 Finally, use a web browser to go to the app IP (defaults to `localhost:3001`) 
 and create a new profile with the credentials:
 
-Username: `runs`
-API: [server IP] (defaults to `localhost:8081`)
-Access Token: [blank]
+Username: `runs` \
+API: [server IP] (default is `http://localhost:8081`) \
+Access Token: [blank] \
 
 Now, clicking on the profile should yield a dashboard interface visualizing the training runs.
 
@@ -202,8 +202,9 @@ ssh unitree@192.168.123.15
 Now, run the following commands on the robot's onboard computer:
 
 ```
-cd ~/go1_gym/go1_gym_deploy/installer
-./install_deployment_code.sh
+chmod +x installer/install_deployment_code.sh
+cd ~/go1_gym/go1_gym_deploy/scripts
+sudo ../installer/install_deployment_code.sh
 ```
 
 The installer will automatically unzip and install the docker image containing the deployment environment. 
