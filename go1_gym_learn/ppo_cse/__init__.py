@@ -41,8 +41,9 @@ caches = DataCaches(1)
 
 
 class RunnerArgs(PrefixProto, cli=False):
+    # TODO: move back to legged_robot_config
     # runner
-    algorithm_class_name = 'RMA'
+    algorithm_class_name = 'RMA' #somebody was trying to reimplement RMA paper eh?
     num_steps_per_env = 24  # per iteration
     max_iterations = 1500  # number of policy updates
 
@@ -60,6 +61,14 @@ class RunnerArgs(PrefixProto, cli=False):
 
 
 class Runner:
+    """ (autogen) A class that handles training and evaluation of a PPO algorithm on a given environment.
+    Adapted from rsl_rl OnPolicyRunner class
+
+    Args:
+        env (gym.Env): The environment to train the algorithm on.
+        device (str, optional): The device to use for computation (default: 'cpu').
+
+    """
 
     def __init__(self, env, device='cpu'):
         from .ppo import PPO
@@ -76,7 +85,7 @@ class Runner:
         if RunnerArgs.resume:
             # load pretrained weights from resume_path
             from ml_logger import ML_Logger
-            loader = ML_Logger(root="http://escher.csail.mit.edu:8080",
+            loader = ML_Logger(root="http://escher.csail.mit.edu:8080", #TODO hardcoded!
                                prefix=RunnerArgs.resume_path)
             weights = loader.load_torch("checkpoints/ac_weights_last.pt")
             actor_critic.load_state_dict(state_dict=weights)
@@ -105,6 +114,20 @@ class Runner:
         self.env.reset()
 
     def learn(self, num_learning_iterations, init_at_random_ep_len=False, eval_freq=100, curriculum_dump_freq=500, eval_expert=False):
+        """ (autogen) Train the algorithm for a given number of iterations.
+
+        Args:
+            num_learning_iterations (int): The number of learning iterations to run.
+            ? init_at_random_ep_len (bool, optional): Whether to initialize episode lengths at random (default: False).
+            ? eval_freq (int, optional): The frequency (in iterations) to evaluate the model (default: 100).
+            curriculum_dump_freq (int, optional): The frequency (in iterations) to save curriculum information (default: 500).
+            eval_expert (bool, optional): Whether to use the expert policy during evaluation (default: False) makes sense only during
+                                            teacher student training, else leave at false.
+
+        Returns:
+            None
+        """
+
         from ml_logger import logger
         # initialize writer
         assert logger.prefix, "you will overwrite the entire instrument server"
@@ -112,18 +135,24 @@ class Runner:
         logger.start('start', 'epoch', 'episode', 'run', 'step')
 
         if init_at_random_ep_len:
+            # Initialize the episode length buffer with random values (between 0 and max_episode_length)
             self.env.episode_length_buf = torch.randint_like(self.env.episode_length_buf,
                                                              high=int(self.env.max_episode_length))
 
-        # split train and test envs
+        # split train and test envs. TODO understand this
+        # it seems that it is possible to split the envs into train and test envs. Thus the code below only operates
+        # on training environemnts (that why of privileged_obs[:num_train_envs])
+        # it could be that evaluation env is used for teacher student setup
         num_train_envs = self.env.num_train_envs
 
+        # get first observations from the environment
         obs_dict = self.env.get_observations()  # TODO: check, is this correct on the first step?
         obs, privileged_obs, obs_history = obs_dict["obs"], obs_dict["privileged_obs"], obs_dict["obs_history"]
         obs, privileged_obs, obs_history = obs.to(self.device), privileged_obs.to(self.device), obs_history.to(
             self.device)
         self.alg.actor_critic.train()  # switch to train mode (for dropout for example)
 
+        # define dequeues to track rewards and episode lengths
         rewbuffer = deque(maxlen=100)
         lenbuffer = deque(maxlen=100)
         rewbuffer_eval = deque(maxlen=100)
@@ -136,6 +165,7 @@ class Runner:
             start = time.time()
             # Rollout
             with torch.inference_mode():
+                # Collect actions and perform a step in the environment
                 for i in range(self.num_steps_per_env):
                     actions_train = self.alg.act(obs[:num_train_envs], privileged_obs[:num_train_envs],
                                                  obs_history[:num_train_envs])
@@ -144,15 +174,18 @@ class Runner:
                                                                          privileged_obs[num_train_envs:])
                     else:
                         actions_eval = self.alg.actor_critic.act_student(obs_history[num_train_envs:])
-                    ret = self.env.step(torch.cat((actions_train, actions_eval), dim=0))
-                    obs_dict, rewards, dones, infos = ret
+                    
+                    # step gym environment and collect observations
+                    obs_dict, rewards, dones, infos = self.env.step(torch.cat((actions_train, actions_eval), dim=0))
                     obs, privileged_obs, obs_history = obs_dict["obs"], obs_dict["privileged_obs"], obs_dict[
                         "obs_history"]
 
+                    # move obsvervations to device. If we train fully on GPU, no need to move
                     obs, privileged_obs, obs_history, rewards, dones = obs.to(self.device), privileged_obs.to(
                         self.device), obs_history.to(self.device), rewards.to(self.device), dones.to(self.device)
                     self.alg.process_env_step(rewards[:num_train_envs], dones[:num_train_envs], infos)
 
+                    # log metrics
                     if 'train/episode' in infos:
                         with logger.Prefix(metrics="train/episode"):
                             logger.store_metrics(**infos['train/episode'])
@@ -160,7 +193,7 @@ class Runner:
                     if 'eval/episode' in infos:
                         with logger.Prefix(metrics="eval/episode"):
                             logger.store_metrics(**infos['eval/episode'])
-
+                    
                     if 'curriculum' in infos:
 
                         cur_reward_sum += rewards
@@ -185,9 +218,9 @@ class Runner:
 
                 stop = time.time()
                 collection_time = stop - start
+                start = stop
 
                 # Learning step
-                start = stop
                 self.alg.compute_returns(obs_history[:num_train_envs], privileged_obs[:num_train_envs])
 
                 if it % curriculum_dump_freq == 0:

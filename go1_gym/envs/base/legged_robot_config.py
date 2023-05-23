@@ -98,7 +98,7 @@ class Cfg(PrefixProto, cli=False):
         teleport_robots = True
         teleport_thresh = 2.0
         max_platform_height = 0.2
-        center_robots = False
+        center_robots = False # center robots in the middle of the terrain grid, only makes sense without curriculum (wtw addition)
         center_span = 5
 
     class commands(PrefixProto, cli=False):

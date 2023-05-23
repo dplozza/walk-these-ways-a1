@@ -58,6 +58,7 @@ class CoRLRewards:
         return torch.sum(out_of_limits, dim=1)
 
     def _reward_jump(self):
+        # body height tracking, no idea why it is called jump
         reference_heights = 0
         body_height = self.env.base_pos[:, 2] - reference_heights
         jump_height_target = self.env.commands[:, 3] + self.env.cfg.rewards.base_height_target
@@ -65,6 +66,7 @@ class CoRLRewards:
         return reward
 
     def _reward_tracking_contacts_shaped_force(self):
+        # penalize nonzero contact forces during swing phase
         foot_forces = torch.norm(self.env.contact_forces[:, self.env.feet_indices, :], dim=-1)
         desired_contact = self.env.desired_contact_states
 
@@ -75,6 +77,7 @@ class CoRLRewards:
         return reward / 4
 
     def _reward_tracking_contacts_shaped_vel(self):
+        # penalize nonzero xy foot velocities during stance phase 
         foot_velocities = torch.norm(self.env.foot_velocities, dim=2).view(self.env.num_envs, -1)
         desired_contact = self.env.desired_contact_states
         reward = 0
@@ -147,6 +150,7 @@ class CoRLRewards:
 
     def _reward_orientation_control(self):
         # Penalize non flat base orientation
+        # Actually nope, also do pitch control!
         roll_pitch_commands = self.env.commands[:, 10:12]
         quat_roll = quat_from_angle_axis(-roll_pitch_commands[:, 1],
                                          torch.tensor([1, 0, 0], device=self.env.device, dtype=torch.float))

@@ -1679,11 +1679,15 @@ class LeggedRobot(BaseTask):
         if cfg.terrain.mesh_type in ["heightfield", "trimesh"]:
             self.custom_origins = True
             # put robots at the origins defined by the terrain
+            # "levels" refer to difficulty levels, which go from 0 to cfg.terrain.num_rows - 1
             max_init_level = cfg.terrain.max_init_terrain_level
             min_init_level = cfg.terrain.min_init_terrain_level
+
+            # No idea what the following lines were supposed to do
             if not cfg.terrain.curriculum: max_init_level = cfg.terrain.num_rows - 1
             if not cfg.terrain.curriculum: min_init_level = 0
             if cfg.terrain.center_robots:
+                # Center robots in the terrain grid, does not work with curriculum (wtw addition)
                 min_terrain_level = cfg.terrain.num_rows // 2 - cfg.terrain.center_span
                 max_terrain_level = cfg.terrain.num_rows // 2 + cfg.terrain.center_span - 1
                 min_terrain_type = cfg.terrain.num_cols // 2 - cfg.terrain.center_span
