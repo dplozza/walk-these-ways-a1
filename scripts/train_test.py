@@ -93,6 +93,7 @@ def train_go1(headless=True):
     Cfg.domain_rand.tile_height_curriculum = False
     Cfg.domain_rand.tile_height_update_interval = 1000000
     Cfg.domain_rand.tile_height_curriculum_step = 0.01
+    Cfg.terrain.terrain_noise_magnitude = 0.15 # make terrain noisy
     Cfg.terrain.border_size = 0.0
     Cfg.terrain.mesh_type = "trimesh"
     Cfg.terrain.num_cols = 30
@@ -106,6 +107,30 @@ def train_go1(headless=True):
     Cfg.terrain.center_robots = True
     Cfg.terrain.center_span = 4
     Cfg.terrain.horizontal_scale = 0.10
+
+    # Terrain tests
+    Cfg.terrain.curriculum = False
+    # default rsl rough terrain
+    #Cfg.terrain.terrain_proportions = [0.1, 0.1, 0.35, 0.25, 0.2] 
+
+    # Cfg.terrain.terrain_proportions = [0.0, 0.3, 0.0, 0.2, 0.5] 
+    # Cfg.terrain.num_rows = 10  # number of terrain rows (levels)
+    # Cfg.terrain.num_cols = 20  # number of terrain cols (types)
+    # Cfg.terrain.border_size = 20.0
+    # Cfg.terrain.terrain_length = 8.
+    # Cfg.terrain.terrain_width = 8.
+    # Cfg.terrain.x_init_range = 1.0
+    # Cfg.terrain.y_init_range = 1.0
+    # Cfg.terrain.teleport_robots = True
+    # Cfg.terrain.teleport_thresh = 2.0
+    # Cfg.terrain.center_robots = False
+    # Cfg.terrain.center_span = 5
+
+    # set maximum starting terrain level after reset so that robot doesn't spawn in the air
+    #Cfg.terrain.min_init_terrain_level = 0
+    #Cfg.terrain.max_init_terrain_level = 5  # starting curriculum state
+
+
     Cfg.rewards.use_terminal_foot_height = False
     Cfg.rewards.use_terminal_body_height = True
     Cfg.rewards.terminal_body_height = 0.05
@@ -119,16 +144,15 @@ def train_go1(headless=True):
     Cfg.reward_scales.action_smoothness_2 = -0.1
     Cfg.reward_scales.dof_vel = -1e-4
     Cfg.reward_scales.dof_pos = -0.0
-    Cfg.reward_scales.jump = 10 #10.0 # this value is NOT used: is just to not disable base position height reward function _jump
-                                  # set it to zero to disable it. It usess base_height_target as "default" target I guess
-    Cfg.reward_scales.base_height = 0.0 # not used
-    Cfg.rewards.base_height_target = 0.30 # used in _jump reward function as zero point (jump_height_target = self.env.commands[:, 3] + self.env.cfg.rewards.base_height_target)
+    Cfg.reward_scales.jump = 10.0
+    Cfg.reward_scales.base_height = 0.0
+    Cfg.rewards.base_height_target = 0.30
     Cfg.reward_scales.estimation_bonus = 0.0
-    Cfg.reward_scales.raibert_heuristic = 0.0 #-10.0
+    Cfg.reward_scales.raibert_heuristic = -10.0
     Cfg.reward_scales.feet_impact_vel = -0.0
     Cfg.reward_scales.feet_clearance = -0.0
     Cfg.reward_scales.feet_clearance_cmd = -0.0
-    Cfg.reward_scales.feet_clearance_cmd_linear = 0.0 # -30.0
+    Cfg.reward_scales.feet_clearance_cmd_linear = 0 # -30.0 # disable feet clearance reward
     Cfg.reward_scales.orientation = 0.0
     Cfg.reward_scales.orientation_control = -5.0
     Cfg.reward_scales.tracking_stance_width = -0.0
@@ -137,11 +161,11 @@ def train_go1(headless=True):
     Cfg.reward_scales.ang_vel_xy = -0.001
     Cfg.reward_scales.feet_air_time = 0.0
     Cfg.reward_scales.hop_symmetry = 0.0
-    Cfg.rewards.kappa_gait_probs = 0.07 # this seems to be not used for reward calculation
+    Cfg.rewards.kappa_gait_probs = 0.07
     Cfg.rewards.gait_force_sigma = 100.
     Cfg.rewards.gait_vel_sigma = 10.
-    Cfg.reward_scales.tracking_contacts_shaped_force = 0 # 4.0
-    Cfg.reward_scales.tracking_contacts_shaped_vel = 0 # 4.0
+    Cfg.reward_scales.tracking_contacts_shaped_force = 4.0
+    Cfg.reward_scales.tracking_contacts_shaped_vel = 4.0
     Cfg.reward_scales.collision = -5.0
 
     Cfg.rewards.reward_container_name = "CoRLRewards"
