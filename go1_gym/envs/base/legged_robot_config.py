@@ -120,7 +120,7 @@ class Cfg(PrefixProto, cli=False):
         global_reference = False
         observe_accel = False
         distributional_commands = False
-        curriculum_type = "RewardThresholdCurriculum"
+        curriculum_type = "RewardThresholdCurriculum" # tere are no other options (it should be GridAdaptive curriculum)
         lipschitz_threshold = 0.9
 
         num_lin_vel_bins = 20

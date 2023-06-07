@@ -111,6 +111,10 @@ class SumCurriculum(Curriculum):
 
 
 class RewardThresholdCurriculum(Curriculum):
+    """ Implementation of Grid Adaptive curriculum from Rapid Locomotion via RL paper
+
+    It supports both velocity inputs and behaviour inputs
+    """
     def __init__(self, seed, **kwargs):
         super().__init__(seed, **kwargs)
 

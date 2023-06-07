@@ -278,7 +278,7 @@ class LeggedRobot(BaseTask):
                 self.rew_buf_neg += rew
             self.episode_sums[name] += rew
             if name in ['tracking_contacts_shaped_force', 'tracking_contacts_shaped_vel']:
-                self.command_sums[name] += self.reward_scales[name] + rew
+                self.command_sums[name] += self.reward_scales[name] + rew # why add constant values
             else:
                 self.command_sums[name] += rew
         if self.cfg.rewards.only_positive_rewards:
@@ -293,6 +293,7 @@ class LeggedRobot(BaseTask):
             self.episode_sums["termination"] += rew
             self.command_sums["termination"] += rew
 
+        # probably add rewards for state estimator (for supervised learning) 
         self.command_sums["lin_vel_raw"] += self.base_lin_vel[:, 0]
         self.command_sums["ang_vel_raw"] += self.base_ang_vel[:, 2]
         self.command_sums["lin_vel_residual"] += (self.base_lin_vel[:, 0] - self.commands[:, 0]) ** 2
@@ -724,6 +725,8 @@ class LeggedRobot(BaseTask):
 
             env_ids_in_category = env_ids[env_ids_in_category]
 
+            # apparently treats tracking_contacts_shaped_force and tracking_contacts_shaped_vel as task rewards! 
+            # also uses command_sums values for curriculum update
             task_rewards, success_thresholds = [], []
             for key in ["tracking_lin_vel", "tracking_ang_vel", "tracking_contacts_shaped_force",
                         "tracking_contacts_shaped_vel"]:
@@ -1422,6 +1425,7 @@ class LeggedRobot(BaseTask):
             for name in self.reward_scales.keys()}
         self.episode_sums_eval["total"] = torch.zeros(self.num_envs, dtype=torch.float, device=self.device,
                                                       requires_grad=False)
+        # used only for cmd curriculum
         self.command_sums = {
             name: torch.zeros(self.num_envs, dtype=torch.float, device=self.device, requires_grad=False)
             for name in
