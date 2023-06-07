@@ -76,8 +76,7 @@ def train_go1(headless=True):
     Cfg.env.priv_observe_gravity_transformed_foot_displacement = False
 
     Cfg.env.num_privileged_obs = 2
-    Cfg.env.num_observation_history = 30
-    Cfg.reward_scales.feet_contact_forces = 0.0
+    Cfg.env.num_observation_history = 30 # default was 30
 
     Cfg.domain_rand.rand_interval_s = 4
     Cfg.commands.num_commands = 15
@@ -93,7 +92,7 @@ def train_go1(headless=True):
     Cfg.domain_rand.tile_height_curriculum = False
     Cfg.domain_rand.tile_height_update_interval = 1000000
     Cfg.domain_rand.tile_height_curriculum_step = 0.01
-    Cfg.terrain.terrain_noise_magnitude = 0.15 # make terrain noisy
+    Cfg.terrain.terrain_noise_magnitude = 0.0 # make terrain noisy
     Cfg.terrain.border_size = 0.0
     Cfg.terrain.mesh_type = "trimesh"
     Cfg.terrain.num_cols = 30
@@ -144,15 +143,15 @@ def train_go1(headless=True):
     Cfg.reward_scales.action_smoothness_2 = -0.1
     Cfg.reward_scales.dof_vel = -1e-4
     Cfg.reward_scales.dof_pos = -0.0
-    Cfg.reward_scales.jump = 10.0
-    Cfg.reward_scales.base_height = 0.0
-    Cfg.rewards.base_height_target = 0.30
+    Cfg.reward_scales.jump = 10.0 # 10.0 just used to enable (0) and enable (any value) position height reward
+    Cfg.reward_scales.base_height = 0.0 #not used?
+    Cfg.rewards.base_height_target = 0.30 # used in _jump reward function as zero point (jump_height_target = self.env.commands[:, 3] + self.env.cfg.rewards.base_height_target)
     Cfg.reward_scales.estimation_bonus = 0.0
-    Cfg.reward_scales.raibert_heuristic = -10.0
-    Cfg.reward_scales.feet_impact_vel = -0.0
+    Cfg.reward_scales.raibert_heuristic = -10.0 # -10.0 #set to 0 to disable
+    Cfg.reward_scales.feet_impact_vel = -10.0
     Cfg.reward_scales.feet_clearance = -0.0
     Cfg.reward_scales.feet_clearance_cmd = -0.0
-    Cfg.reward_scales.feet_clearance_cmd_linear = 0 # -30.0 # disable feet clearance reward
+    Cfg.reward_scales.feet_clearance_cmd_linear = -30.0 # -30.0 # disable feet clearance reward
     Cfg.reward_scales.orientation = 0.0
     Cfg.reward_scales.orientation_control = -5.0
     Cfg.reward_scales.tracking_stance_width = -0.0
@@ -161,23 +160,27 @@ def train_go1(headless=True):
     Cfg.reward_scales.ang_vel_xy = -0.001
     Cfg.reward_scales.feet_air_time = 0.0
     Cfg.reward_scales.hop_symmetry = 0.0
-    Cfg.rewards.kappa_gait_probs = 0.07
+    Cfg.rewards.kappa_gait_probs = 0.07 # this seems to be not used for reward calculation ?
     Cfg.rewards.gait_force_sigma = 100.
     Cfg.rewards.gait_vel_sigma = 10.
-    Cfg.reward_scales.tracking_contacts_shaped_force = 4.0
-    Cfg.reward_scales.tracking_contacts_shaped_vel = 4.0
+    Cfg.reward_scales.tracking_contacts_shaped_force = 4.0 #4.0  swing phase reward (0 = disabled)
+    Cfg.reward_scales.tracking_contacts_shaped_vel = 4.0 #4.0 # stance phase reward (0 = disabled)
     Cfg.reward_scales.collision = -5.0
+    Cfg.reward_scales.feet_contact_forces = 0.0
 
     Cfg.rewards.reward_container_name = "CoRLRewards"
     Cfg.rewards.only_positive_rewards = False
-    Cfg.rewards.only_positive_rewards_ji22_style = True
-    Cfg.rewards.sigma_rew_neg = 0.02
+    Cfg.rewards.only_positive_rewards_ji22_style = True # check Concurrent Training of a Control Policy and a State Estimator for Quadrupeds...
+    Cfg.rewards.sigma_rew_neg = 0.02 # c_aux
 
 
+    # Important curriculum supports both cmd velocites and behavior inputs
+    # To disable set limits same as initial values
 
-    Cfg.commands.lin_vel_x = [-1.0, 1.0]
-    Cfg.commands.lin_vel_y = [-0.6, 0.6]
-    Cfg.commands.ang_vel_yaw = [-1.0, 1.0]
+    # Curriculum initial values
+    Cfg.commands.lin_vel_x = [-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
+    Cfg.commands.lin_vel_y = [-0.6, 0.6] # no curriculum
+    Cfg.commands.ang_vel_yaw = [-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
     Cfg.commands.body_height_cmd = [-0.25, 0.15]
     Cfg.commands.gait_frequency_cmd_range = [2.0, 4.0]
     Cfg.commands.gait_phase_cmd_range = [0.0, 1.0]
@@ -190,9 +193,10 @@ def train_go1(headless=True):
     Cfg.commands.stance_width_range = [0.10, 0.45]
     Cfg.commands.stance_length_range = [0.35, 0.45]
 
-    Cfg.commands.limit_vel_x = [-5.0, 5.0]
+    # Curriculum end values
+    Cfg.commands.limit_vel_x = [-5.0, 5.0] # [-2.0, 2.0] # curriculum ends at these values (can set smaller!)
     Cfg.commands.limit_vel_y = [-0.6, 0.6]
-    Cfg.commands.limit_vel_yaw = [-5.0, 5.0]
+    Cfg.commands.limit_vel_yaw = [-5.0, 5.0] #[-3.0, 3.0] # curriculum ends at these values (can set smaller!)
     Cfg.commands.limit_body_height = [-0.25, 0.15]
     Cfg.commands.limit_gait_frequency = [2.0, 4.0]
     Cfg.commands.limit_gait_phase = [0.0, 1.0]
@@ -227,7 +231,7 @@ def train_go1(headless=True):
     Cfg.commands.exclusive_phase_offset = False
     Cfg.commands.pacing_offset = False
     Cfg.commands.binary_phases = True
-    Cfg.commands.gaitwise_curricula = True
+    Cfg.commands.gaitwise_curricula = True # False = disable different curricula for each gait (needed if train gait free)
 
     env = VelocityTrackingEasyEnv(sim_device='cuda:0', headless=False, cfg=Cfg)
 
@@ -255,6 +259,8 @@ if __name__ == '__main__':
                   xKey: iterations
                 - yKey: train/episode/rew_tracking_lin_vel/mean
                   xKey: iterations
+                - yKey: train/episode/rew_tracking_ang_vel/mean
+                  xKey: iterations
                 - yKey: train/episode/rew_tracking_contacts_shaped_force/mean
                   xKey: iterations
                 - yKey: train/episode/rew_action_smoothness_1/mean
@@ -266,6 +272,8 @@ if __name__ == '__main__':
                 - yKey: train/episode/rew_orientation_control/mean
                   xKey: iterations
                 - yKey: train/episode/rew_dof_pos/mean
+                  xKey: iterations
+                - yKey: train/episode/rew_feet_impact_vel/mean
                   xKey: iterations
                 - yKey: train/episode/command_area_trot/mean
                   xKey: iterations

@@ -173,7 +173,7 @@ def load_env(label,iteration=-1, headless=False):
 
     # random_uniform_terrain, used by wtw, affeted by terrain_noise_magnitude
     Cfg.terrain.terrain_proportions = [0, 0, 0, 0, 0, 0, 0, 0, 1.0]
-    Cfg.terrain.terrain_noise_magnitude = 0.15
+    Cfg.terrain.terrain_noise_magnitude = 0.05
 
     #Cfg.terrain.vertical_scale = 0.005  # not so clear what is does, should be y scale, but does not seem to have intented effect. used in add_terrain_to_map 
 
@@ -242,14 +242,16 @@ def play_go1(headless=True):
     #label = "gait-conditioned-agility/2023-05-09/train_gait_free/214017.834160"
     #label = "gait-conditioned-agility/2023-05-12/train_gait_free"
     #label = "gait-conditioned-agility/2023-04-28/train"
+
+    label = "gait-conditioned-agility/2023-05-25/train_test" #flat training
     
-    label = "gait-conditioned-agility/2023-05-21/train_test/201656.324630" #rough training
+    #label = "gait-conditioned-agility/2023-05-21/train_test/201656.324630" #rough training
     # iteration =  20000 #-1 for last iteration
-    iteration =  20000 #40000 #20000
+    iteration =  40000 #20000
 
     # best on rough
-    #label = "gait-conditioned-agility/2023-05-14/train_test
-    #iteration =  30000
+    # label = "gait-conditioned-agility/2023-05-14/train_test"
+    # iteration =  30000
 
     # label = "gait-conditioned-agility/pretrain-v0/train"
     # iteration = -1
