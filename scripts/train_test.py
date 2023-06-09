@@ -148,7 +148,7 @@ def train_go1(headless=True):
     Cfg.rewards.base_height_target = 0.30 # used in _jump reward function as zero point (jump_height_target = self.env.commands[:, 3] + self.env.cfg.rewards.base_height_target)
     Cfg.reward_scales.estimation_bonus = 0.0
     Cfg.reward_scales.raibert_heuristic = -10.0 # -10.0 #set to 0 to disable
-    Cfg.reward_scales.feet_impact_vel = -10.0
+    Cfg.reward_scales.feet_impact_vel = -0.0 #-100.0
     Cfg.reward_scales.feet_clearance = -0.0
     Cfg.reward_scales.feet_clearance_cmd = -0.0
     Cfg.reward_scales.feet_clearance_cmd_linear = -30.0 # -30.0 # disable feet clearance reward
@@ -166,7 +166,7 @@ def train_go1(headless=True):
     Cfg.reward_scales.tracking_contacts_shaped_force = 4.0 #4.0  swing phase reward (0 = disabled)
     Cfg.reward_scales.tracking_contacts_shaped_vel = 4.0 #4.0 # stance phase reward (0 = disabled)
     Cfg.reward_scales.collision = -5.0
-    Cfg.reward_scales.feet_contact_forces = 0.0
+    Cfg.reward_scales.feet_contact_forces = -0.1
 
     Cfg.rewards.reward_container_name = "CoRLRewards"
     Cfg.rewards.only_positive_rewards = False
@@ -233,7 +233,7 @@ def train_go1(headless=True):
     Cfg.commands.binary_phases = True
     Cfg.commands.gaitwise_curricula = True # False = disable different curricula for each gait (needed if train gait free)
 
-    env = VelocityTrackingEasyEnv(sim_device='cuda:0', headless=False, cfg=Cfg)
+    env = VelocityTrackingEasyEnv(sim_device='cuda:0', headless=headless, cfg=Cfg)
 
     # log the experiment parameters
     logger.log_params(AC_Args=vars(AC_Args), PPO_Args=vars(PPO_Args), RunnerArgs=vars(RunnerArgs),
@@ -246,9 +246,15 @@ def train_go1(headless=True):
 
 
 if __name__ == '__main__':
+    import argparse
     from pathlib import Path
     from ml_logger import logger
     from go1_gym import MINI_GYM_ROOT_DIR
+
+    parser = argparse.ArgumentParser(description="Script with headless parameter.")
+    parser.add_argument("--headless", action="store_true", help="Enable headless mode.")
+    args = parser.parse_args()
+
 
     stem = Path(__file__).stem
     logger.configure(logger.utcnow(f'gait-conditioned-agility/%Y-%m-%d/{stem}/%H%M%S.%f'),
@@ -275,6 +281,8 @@ if __name__ == '__main__':
                   xKey: iterations
                 - yKey: train/episode/rew_feet_impact_vel/mean
                   xKey: iterations
+                - yKey: train/episode/rew_feet_contact_forces/mean
+                  xKey: iterations
                 - yKey: train/episode/command_area_trot/mean
                   xKey: iterations
                 - yKey: train/episode/max_terrain_height/mean
@@ -286,4 +294,4 @@ if __name__ == '__main__':
                 """, filename=".charts.yml", dedent=True)
 
     # to see the environment rendering, set headless=False
-    train_go1(headless=False)
+    train_go1(headless=args.headless)
