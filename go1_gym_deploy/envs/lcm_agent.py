@@ -109,6 +109,7 @@ class LCMAgent():
 
         self.joint_idxs = self.se.joint_idxs
 
+        # gait_indices: 
         self.gait_indices = torch.zeros(self.num_envs, dtype=torch.float)
         self.clock_inputs = torch.zeros(self.num_envs, 4, dtype=torch.float)
 
@@ -236,15 +237,17 @@ class LCMAgent():
         obs = self.get_obs()
 
         # clock accounting
-        frequencies = self.commands[:, 4]
-        phases = self.commands[:, 5]
-        offsets = self.commands[:, 6]
+        # implementation similar to the training code (_step_contact_targets() in legged_robot.py)
+
+        frequencies = self.commands[:, 4] # step frequency
+        phases = self.commands[:, 5] # theta1 in the paper
+        offsets = self.commands[:, 6] # theta2 in the paper
         if self.num_commands == 8:
             bounds = 0
             durations = self.commands[:, 7]
         else:
-            bounds = self.commands[:, 7]
-            durations = self.commands[:, 8]
+            bounds = self.commands[:, 7] # theta3 in the paper
+            durations = self.commands[:, 8] # hardcoded to 0.5 in play_test?
         self.gait_indices = torch.remainder(self.gait_indices + self.dt * frequencies, 1.0)
 
         if "pacing_offset" in self.cfg["commands"] and self.cfg["commands"]["pacing_offset"]:

@@ -188,7 +188,7 @@ class Cfg(PrefixProto, cli=False):
 
         exclusive_phase_offset = True
         binary_phases = False
-        pacing_offset = False
+        pacing_offset = False # used in the foot timing variables computation
         balance_gait_distribution = True
         gaitwise_curricula = True
 

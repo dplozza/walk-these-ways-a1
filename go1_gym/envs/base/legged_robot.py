@@ -827,12 +827,19 @@ class LeggedRobot(BaseTask):
             self.command_sums[key][env_ids] = 0.
 
     def _step_contact_targets(self):
+        """ Calculates the contact targets, used in the reward functions
+
+        Calculates desired_contact_states desired_footswing_height, that are used in the reward functions
+        This code implements the "C_food(theta,t) function from the paper (section 3.1)
+        It appears that gait_indices and other variables are also used as inputs to the policy
+        
+        """
         if self.cfg.env.observe_gait_commands:
-            frequencies = self.commands[:, 4]
-            phases = self.commands[:, 5]
-            offsets = self.commands[:, 6]
-            bounds = self.commands[:, 7]
-            durations = self.commands[:, 8]
+            frequencies = self.commands[:, 4] # step frequency
+            phases = self.commands[:, 5] # theta1 in the paper
+            offsets = self.commands[:, 6] # theta2 in the paper
+            bounds = self.commands[:, 7] # theta3 in the paper
+            durations = self.commands[:, 8] # hardcoded to 0.5 in play_test?
             self.gait_indices = torch.remainder(self.gait_indices + self.dt * frequencies, 1.0)
 
             if self.cfg.commands.pacing_offset:
@@ -1159,7 +1166,8 @@ class LeggedRobot(BaseTask):
         self.contact_forces = gymtorch.wrap_tensor(net_contact_forces)[:self.num_envs * self.num_bodies, :].view(self.num_envs, -1,
                                                                             3)  # shape: num_envs, num_bodies, xyz axis
 
-        # initialize some data used later on
+        # initialize some data used later on. Oh very usfeul comment
+        # "Extras is used in velocity tracking env"
         self.common_step_counter = 0
         self.extras = {}
 
