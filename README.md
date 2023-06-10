@@ -33,10 +33,22 @@ This repository provides an implementation of the paper:
       <em>Conference on Robot Learning</em>, 2022
       <br>
       <a href="https://openreview.net/pdf?id=52c5e73SlS2">paper</a> /
-      <a href="">bibtex</a> /
       <a href="https://gmargo11.github.io/walk-these-ways/" target="_blank">project page</a>
     <br>
 </td>
+
+<br>
+
+If you use this repository in your work, consider citing:
+
+```
+@article{margolis2022walktheseways,
+    title={Walk These Ways: Tuning Robot Control for Generalization with Multiplicity of Behavior},
+    author={Margolis, Gabriel B and Agrawal, Pulkit},
+    journal={Conference on Robot Learning},
+    year={2022}
+}
+```
 
 <br>
 
@@ -212,7 +224,7 @@ The installer will automatically unzip and install the docker image containing t
 
 ### Running the Controller  <a name="runcontroller"></a>
 
-Place the robot into damping mode. The control sequence is: [L1+B], [L1+A], [L1+L2+START]. After this, the robot should sit on the ground and the joints should move freely. 
+Place the robot into damping mode. The control sequence is: [L2+A], [L2+B], [L1+L2+START]. After this, the robot should sit on the ground and the joints should move freely. 
 
 Now, ssh to `unitree@192.168.123.15` and run the following two commands to start the controller. <b>This will operate the robot in low-level control mode. Make sure your Go1 is hung up.</b>
 
