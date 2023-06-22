@@ -166,7 +166,7 @@ def train_go1(headless=True):
     Cfg.reward_scales.tracking_contacts_shaped_force = 4.0 #4.0  swing phase reward (0 = disabled)
     Cfg.reward_scales.tracking_contacts_shaped_vel = 4.0 #4.0 # stance phase reward (0 = disabled)
     Cfg.reward_scales.collision = -5.0
-    Cfg.reward_scales.feet_contact_forces = -0.1
+    Cfg.reward_scales.feet_contact_forces = -0.0
 
     Cfg.rewards.reward_container_name = "CoRLRewards"
     Cfg.rewards.only_positive_rewards = False
@@ -178,9 +178,9 @@ def train_go1(headless=True):
     # To disable set limits same as initial values
 
     # Curriculum initial values
-    Cfg.commands.lin_vel_x = [-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
+    Cfg.commands.lin_vel_x = [-1.0, 1.0] #[-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
     Cfg.commands.lin_vel_y = [-0.6, 0.6] # no curriculum
-    Cfg.commands.ang_vel_yaw = [-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
+    Cfg.commands.ang_vel_yaw = [-1.0, 1.0] #[-1.0, 1.0] # initial range, then uses GridAdaptive curriculum
     Cfg.commands.body_height_cmd = [-0.25, 0.15]
     Cfg.commands.gait_frequency_cmd_range = [2.0, 4.0]
     Cfg.commands.gait_phase_cmd_range = [0.0, 1.0]
@@ -194,9 +194,9 @@ def train_go1(headless=True):
     Cfg.commands.stance_length_range = [0.35, 0.45]
 
     # Curriculum end values
-    Cfg.commands.limit_vel_x = [-5.0, 5.0] # [-2.0, 2.0] # curriculum ends at these values (can set smaller!)
+    Cfg.commands.limit_vel_x = [-1.0, 1.0] #[-5.0, 5.0] # [-2.0, 2.0] # curriculum ends at these values (can set smaller!)
     Cfg.commands.limit_vel_y = [-0.6, 0.6]
-    Cfg.commands.limit_vel_yaw = [-5.0, 5.0] #[-3.0, 3.0] # curriculum ends at these values (can set smaller!)
+    Cfg.commands.limit_vel_yaw = [-1.0, 1.0] #[-5.0, 5.0] #[-3.0, 3.0] # curriculum ends at these values (can set smaller!)
     Cfg.commands.limit_body_height = [-0.25, 0.15]
     Cfg.commands.limit_gait_frequency = [2.0, 4.0]
     Cfg.commands.limit_gait_phase = [0.0, 1.0]
