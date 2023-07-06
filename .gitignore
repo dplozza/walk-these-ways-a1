@@ -1,4 +1,3 @@
-runs
 # Jaynes secret files
 .secret*
 # ml_logger cache files
@@ -58,6 +57,7 @@ Thumbs.db
 # logs
 logs
 runs
+test
 
 # other
 *.egg-info
@@ -68,3 +68,5 @@ docker/rsc
 *.jit
 tmp
 *.tar
+
+*.ipynb_checkpoints
