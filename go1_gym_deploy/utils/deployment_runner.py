@@ -29,7 +29,7 @@ class DeploymentRunner:
         self.is_currently_logging = [False, False, False, False]
 
     def init_log_filename(self):
-        datetime = time.strftime("%Y/%m_%d/%H_%M_%S")
+        datetime = time.strftime("%Y-%m-%d_%H-%M-%S")
 
         for i in range(100):
             try:

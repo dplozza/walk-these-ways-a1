@@ -14,8 +14,10 @@ lc = lcm.LCM("udpm://239.255.76.67:7667?ttl=255")
 
 def load_and_run_policy(label, experiment_name, max_vel=1.0, max_yaw_vel=1.0):
     # load agent
-    dirs = glob.glob(f"../../runs/{label}/*")
-    logdir = sorted(dirs)[0]
+    #dirs = glob.glob(f"../../runs/{label}/*")
+    #logdir = sorted(dirs)[0]
+    logdir = f"../../runs/{label}"
+    
 
     with open(logdir+"/parameters.pkl", 'rb') as file:
         pkl_cfg = pkl.load(file)
@@ -70,7 +72,8 @@ def load_policy(logdir):
 
 
 if __name__ == '__main__':
-    label = "gait-conditioned-agility/pretrain-v0/train"
+    #label = "gait-conditioned-agility/pretrain-v0/train"
+    label = "gait-conditioned-agility/pretrain-v0"
 
     experiment_name = "example_experiment"
 
