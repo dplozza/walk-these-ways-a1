@@ -120,6 +120,12 @@ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/<use-name>/anaconda3/envs/<e
 
 In this repository, run `pip install -e .`
 
+If get errors:
+```
+sudo apt-get install libcurl4-openssl-dev
+sudo apt-get install libssl-dev
+```
+
 ### Verifying the Installation
 
 If everything is installed correctly, you should be able to run the test script with:
