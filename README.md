@@ -74,6 +74,15 @@ Our initial release provides the following features:
 
 ### Installation <a name="installation"></a>
 
+#### Install anaconda3 and create env
+
+Install anaconda3 https://www.anaconda.com/download
+
+Create python 3.8.16 environment
+```bash
+conda create --name wtw python=3.8.16
+```
+
 #### Install pytorch 1.10 with cuda-11.3:
 
 ```bash
@@ -98,6 +107,13 @@ pip3 install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio==0.10.0+cu
     python examples/1080_balls_of_solitude.py
     ```
 5. For troubleshooting check docs `isaacgym/docs/index.html`
+
+If you get the error `ImportError: libpython3.7m.so.1.0: cannot open shared object file: No such file or directory`:
+```bash
+cd ~/anaconda3/envs/<env_name>
+mkdir -p etc/conda/activate.d
+echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/<use-name>/anaconda3/envs/<env_name>/lib' >> etc/conda/activate.d/ld_library_path.sh
+```
 
 #### Install the `go1_gym` package
 
